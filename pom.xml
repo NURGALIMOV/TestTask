@@ -1,0 +1,19 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ru.inurgalimov</groupId>
+    <artifactId>javadev</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0</version>
+     <name>javadev</name>
+     <url></url>
+
+    <properties>
+       <maven.compiler.source>1.8</maven.compiler.source>
+       <maven.compiler.target>1.8</maven.compiler.target>
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+
+    <modules>
+       <module>telegrambot</module>
+     </modules>
+</project>
