@@ -30,9 +30,8 @@ public class Database {
 
     void add(String login, String passwd) { // add record
         try {
-            stmt.executeUpdate("INSERT INTO " + "users" +
-                    " (login, passwd) " +
-                    "VALUES ('" + login + "', '" + passwd + "');");
+            stmt.executeUpdate("INSERT INTO " + "users" + " (login, passwd) "
+                    + "VALUES ('" + login + "', '" + passwd + "');");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,9 +39,8 @@ public class Database {
 
     void update(String login, String passwd) { // update record/passwd by login
         try {
-            stmt.executeUpdate("UPDATE " + "users" +
-                    " set PASSWD='" + passwd +
-                    "' where LOGIN='" + login + "';");
+            stmt.executeUpdate("UPDATE " + "users" + " set PASSWD='" + passwd
+                    + "' where LOGIN='" + login + "';");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,8 +48,8 @@ public class Database {
 
     void delete(String login) { // delete record by login
         try {
-            stmt.executeUpdate("DELETE from " + "users" +
-                    " where LOGIN='" + login + "';");
+            stmt.executeUpdate("DELETE from " + "users"
+                    + " where LOGIN='" + login + "';");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,9 +59,10 @@ public class Database {
         try {
             System.out.println("LOGIN\tPASSWD");
             rs = stmt.executeQuery("SELECT * FROM " + "users" + ";");
-            while (rs.next())
-                System.out.println(rs.getString("login") + "\t\t" +
-                        rs.getString("passwd"));
+            while (rs.next()) {
+                System.out.println(rs.getString("login") + "\t\t"
+                        + rs.getString("passwd"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

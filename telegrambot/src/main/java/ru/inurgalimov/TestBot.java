@@ -39,9 +39,9 @@ public class TestBot extends TelegramLongPollingBot implements LongPollingBot {
         if (arr[0].equals("add")) {
             database.add(arr[1], arr[2]);
         } else if (arr[0].equals("update")) {
-
+            System.out.println("U");
         } else if (arr[0].equals("get")) {
-
+            System.out.println("G");
         } else {
             sendMsg(update.getMessage().getChatId().toString(), "Я вас не понимаю!");
         }
