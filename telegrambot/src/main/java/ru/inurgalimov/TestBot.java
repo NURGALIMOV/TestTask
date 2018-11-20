@@ -7,16 +7,21 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.generics.LongPollingBot;
 
-import java.util.logging.Level;
+public class TestBot extends TelegramLongPollingBot implements LongPollingBot {
+    private Database database;
 
-public class TestBot extends TelegramLongPollingBot {
+    public TestBot() {
+        database = new Database();
+        database.openDBFile("users");
+    }
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
-            telegramBotsApi.registerBot(TestBot.getBot());
+            telegramBotsApi.registerBot(new TestBot());
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         }
@@ -30,7 +35,17 @@ public class TestBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         String message = update.getMessage().getText();
-        sendMsg(update.getMessage().getChatId().toString(), message);
+        String[] arr = message.split(" ");
+        if (arr[0].equals("add")) {
+            database.add(arr[1], arr[2]);
+        } else if (arr[0].equals("update")) {
+
+        } else if (arr[0].equals("get")) {
+
+        } else {
+            sendMsg(update.getMessage().getChatId().toString(), "Я вас не понимаю!");
+        }
+//            sendMsg(update.getMessage().getChatId().toString(), message);
     }
 
     /**
@@ -47,7 +62,7 @@ public class TestBot extends TelegramLongPollingBot {
         try {
             sendMessage(sendMessage);
         } catch (TelegramApiException e) {
-            log.log(Level.SEVERE, "Exception: ", e.toString());
+            e.printStackTrace();
         }
     }
 
@@ -58,7 +73,7 @@ public class TestBot extends TelegramLongPollingBot {
      */
     @Override
     public String getBotUsername() {
-        return "TestBot";
+        return "@Inurtestbot";
     }
 
     /**
