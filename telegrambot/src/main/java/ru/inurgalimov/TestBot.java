@@ -14,7 +14,9 @@ public class TestBot extends TelegramLongPollingBot implements LongPollingBot {
 
     public TestBot() {
         database = new Database();
-        database.openDBFile("users");
+        database.openDBFile("jdbc:sqlite:C:\\java\\users.sqlite");
+        database.createTable("CREATE TABLE users(surname  text PRIMARY KEY NOT NULL, "
+                + "name text, data text);");
     }
 
     public static void main(String[] args) {
@@ -37,15 +39,22 @@ public class TestBot extends TelegramLongPollingBot implements LongPollingBot {
         String message = update.getMessage().getText();
         String[] arr = message.split(" ");
         if (arr[0].equals("add")) {
-            database.add(arr[1], arr[2]);
+            database.add(arr[1], arr[2], arr[3]);
+            sendMsg(update.getMessage().getChatId().toString(), "Пользователь добавлен в список!");
         } else if (arr[0].equals("update")) {
-            System.out.println("U");
-        } else if (arr[0].equals("get")) {
-            System.out.println("G");
+            database.update(arr[1], arr[3]);
+            sendMsg(update.getMessage().getChatId().toString(), "Данные по пользователю обновлены!");
+        } else if (arr[0].equals("delete")) {
+            database.delete(arr[1]);
+            sendMsg(update.getMessage().getChatId().toString(), "Пользователь удален из списка!");
+        } else if (arr[0].equals("list")) {
+            sendMsg(update.getMessage().getChatId().toString(), "Данные");
+            for (String str : database.list()) {
+                sendMsg(update.getMessage().getChatId().toString(), str);
+            }
         } else {
             sendMsg(update.getMessage().getChatId().toString(), "Я вас не понимаю!");
         }
-//            sendMsg(update.getMessage().getChatId().toString(), message);
     }
 
     /**

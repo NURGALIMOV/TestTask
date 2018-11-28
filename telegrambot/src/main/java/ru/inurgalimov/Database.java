@@ -1,16 +1,20 @@
 package ru.inurgalimov;
 
-import java.util.*;
-import java.sql.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Database {
-    Connection connect;
-    Statement stmt;
-    ResultSet rs;
-    String sql;
+    private Connection connect;
+    private Statement stmt;
+    private ResultSet rs;
+    private String sql;
 
-    void openDBFile(String dbName) { // open database
+    public void openDBFile(String dbName) { // open database
         try {
             Class.forName("org.sqlite.JDBC");
             connect = DriverManager.getConnection(dbName);
@@ -20,7 +24,7 @@ public class Database {
         }
     }
 
-    void createTable(String sqlCreateTable) { // create table
+    public void createTable(String sqlCreateTable) { // create table
         try {
             stmt.executeUpdate(sqlCreateTable);
         } catch (Exception e) {
@@ -28,44 +32,44 @@ public class Database {
         }
     }
 
-    void add(String login, String passwd) { // add record
+    public void add(String surname, String name, String data) { // add record
         try {
-            stmt.executeUpdate("INSERT INTO " + "users" + " (login, passwd) "
-                    + "VALUES ('" + login + "', '" + passwd + "');");
+            stmt.execute("INSERT INTO " + "users" + " (surname, name, data) "
+                    + "VALUES ('" + surname + "', '" + name + "', '" + data + "');");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void update(String login, String passwd) { // update record/passwd by login
+    public void update(String surname, String data) { // update record/passwd by login
         try {
-            stmt.executeUpdate("UPDATE " + "users" + " set PASSWD='" + passwd
-                    + "' where LOGIN='" + login + "';");
+            stmt.executeUpdate("UPDATE " + "users" + " set DATA ='" + data
+                    + "' where SURNAME='" + surname + "';");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void delete(String login) { // delete record by login
+    public void delete(String surname) { // delete record by login
         try {
             stmt.executeUpdate("DELETE from " + "users"
-                    + " where LOGIN='" + login + "';");
+                    + " where SURNAME='" + surname + "';");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void list() { // list all records
+    public List<String> list() { // list all records
+        List<String> list = new ArrayList<>();
         try {
-            System.out.println("LOGIN\tPASSWD");
             rs = stmt.executeQuery("SELECT * FROM " + "users" + ";");
             while (rs.next()) {
-                System.out.println(rs.getString("login") + "\t\t"
-                        + rs.getString("passwd"));
+                list.add(rs.getString("surname") + "\t\t"
+                        + rs.getString("name") + "\t\t" + rs.getString("data"));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return list;
     }
-
 }
