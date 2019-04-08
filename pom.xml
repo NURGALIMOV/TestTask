@@ -15,6 +15,7 @@
 
     <modules>
         <module>telegrambot</module>
+        <module>search</module>
     </modules>
 
     <build>
