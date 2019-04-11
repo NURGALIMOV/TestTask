@@ -20,26 +20,31 @@ import java.util.Map;
  * 6. В программе должна быть валидация ключей и подсказка.
  *
  * @author Nurgalimov Ilshat
- * @version 13.03.2019
+ * @version 11.04.2019
  */
 public class FileSearchStart {
     private Map<String, String> map = new HashMap<>();
+    private String searchRule;
 
-    public FileSearchStart(String d, String n, String o) {
-        this.map.put("-d", d);
-        this.map.put("-n", n);
+    public FileSearchStart(String[] args) {
         this.map.put("-m", "-m");
         this.map.put("-f", "-f");
         this.map.put("-r", "-r");
-        this.map.put("-o", o);
+        for (int i = 0; i < args.length; i++) {
+            if (!(args[i].equals("-m") || args[i].equals("-f") || args[i].equals("-r"))) {
+                this.map.put(args[i++], args[i]);
+            } else {
+                this.searchRule = args[i];
+            }
+        }
     }
 
     public static void main(String[] args) {
-        FileSearchStart fss = new FileSearchStart(args[1], args[3], args[6]);
+        FileSearchStart fss = new FileSearchStart(args);
 
         try {
-            FileSearch fileSearch = new FileSearch(fss.validate(args[0]), fss.validate(args[2]),
-                    fss.validate(args[4]), fss.validate(args[5]));
+            FileSearch fileSearch = new FileSearch(fss.validate("-d"), fss.validate("-n"),
+                    fss.validate(fss.searchRule), fss.validate("-o"));
             Files.walkFileTree(Paths.get(fss.validate("-d")), fileSearch);
 
         } catch (Exception e) {

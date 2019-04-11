@@ -7,9 +7,8 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,44 +33,62 @@ public class FileSearch extends SimpleFileVisitor<Path> {
     private String fileName;
     private String searchRule;
     private File result;
+    private Map<String, Consumer<Path>> map = new HashMap();
 
     public FileSearch(String directory, String fileName, String searchRule, String result) {
         this.root = new File(directory);
         this.fileName = fileName;
         this.searchRule = searchRule;
         this.result = new File(result);
+        this.map.put("-m", this::searchM);
+        this.map.put("-f", this::searchF);
+        this.map.put("-r", this::searchR);
     }
 
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-        File file = path.toFile();
-        switch (searchRule) {
-            case "-m":
-                if (file.getName().contains(this.fileName)) {
-                    this.writeLog(file);
-                }
-                break;
-            case "-f":
-                if (this.fileName.equals(file.getName())) {
-                    this.writeLog(file);
-                }
-                break;
-            case "-r":
-                Pattern pattern = Pattern.compile(fileName);
-                Matcher matcher = pattern.matcher(file.getName());
-                if (matcher.find()) {
-                    this.writeLog(file);
-                }
-                break;
-            default:
-                throw new UnsupportedOperationException("not known search key");
-        }
+        this.map.get(searchRule).accept(path);
         return FileVisitResult.CONTINUE;
     }
 
     protected void writeLog(File file) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(result, true)) {
             fos.write((file.getAbsolutePath() + "\n").getBytes());
+        }
+    }
+
+    private void searchM(Path path) {
+        File file = path.toFile();
+        if (file.getName().contains(this.fileName)) {
+            try {
+                this.writeLog(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void searchF(Path path) {
+        File file = path.toFile();
+        if (this.fileName.equals(file.getName())) {
+            try {
+                this.writeLog(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void searchR(Path path) {
+        File file = path.toFile();
+        Pattern pattern = Pattern.compile(fileName);
+        Matcher matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            try {
+                this.writeLog(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
