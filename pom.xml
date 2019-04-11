@@ -16,6 +16,7 @@
     <modules>
         <module>telegrambot</module>
         <module>search</module>
+        <module>hotel</module>
     </modules>
 
     <build>
