@@ -3,6 +3,7 @@ package ru.inurgalimov;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 
 /**
@@ -25,6 +26,7 @@ import java.util.Map;
  */
 public class Converter {
     private Map<String, String> config = new HashMap<>();
+    private Map<String, BooleanSupplier> map = new HashMap<>();
     private static final String TYPEBYTE = "byte";
     private static final String TYPEBIT = "bit";
     private static final long MAXSIZE = 70_368_744_177_664L;
@@ -47,6 +49,8 @@ public class Converter {
         } else {
             config.put("-t", config.get("-t").toLowerCase());
         }
+        this.map.put(TYPEBYTE, this :: convertByte);
+        this.map.put(TYPEBIT, this :: convertBit);
     }
 
     public static void main(String[] args) {
@@ -60,12 +64,7 @@ public class Converter {
         }
         Converter converter = new Converter(args);
         if (converter.validate()) {
-            if (TYPEBYTE.equals(converter.config.get("-t"))) {
-                converter.convertByte();
-            }
-            if (TYPEBIT.equals(converter.config.get("-t"))) {
-                converter.convertBit();
-            }
+            converter.map.get(converter.config.get("-t")).getAsBoolean();
         }
     }
 
@@ -87,7 +86,6 @@ public class Converter {
                 this.fileOut = new File(this.config.get("-d"));
             }
         }
-
         return check;
     }
 
