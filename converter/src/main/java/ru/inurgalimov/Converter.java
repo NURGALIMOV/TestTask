@@ -44,13 +44,15 @@ public class Converter {
         if (config.get("-d") == null) {
             config.put("-d", config.get("-s"));
         }
-        if (config.get("-t") == null || (!TYPEBYTE.equals(config.get("-t")) && !TYPEBIT.equals(config.get("-t")))) {
+        if (config.get("-t") == null
+                || (!TYPEBYTE.equals(config.get("-t").toLowerCase())
+                && !TYPEBIT.equals(config.get("-t").toLowerCase()))) {
             config.put("-t", TYPEBYTE);
         } else {
             config.put("-t", config.get("-t").toLowerCase());
         }
-        this.map.put(TYPEBYTE, this :: convertByte);
-        this.map.put(TYPEBIT, this :: convertBit);
+        this.map.put(TYPEBYTE, this::convertByte);
+        this.map.put(TYPEBIT, this::convertBit);
     }
 
     public static void main(String[] args) {
@@ -90,17 +92,31 @@ public class Converter {
     }
 
     public boolean convertByte() {
-        try (FileInputStream in = new FileInputStream(this.fileIn)) {
-            int first = in.read();
-            int size = in.available();
-            while (size != 1) {
-                in.skip((long) size - 1);
-                size = in.available();
-            }
-            int last = in.read();
-            try (FileOutputStream out = new FileOutputStream(this.fileOut)) {
-                out.write(first);
-                out.write(last);
+        try {
+            if (!this.fileIn.getName().equals(this.fileOut.getName())) {
+                try (RandomAccessFile in = new RandomAccessFile(this.fileIn, "r");
+                     RandomAccessFile out = new RandomAccessFile(this.fileOut, "rw")) {
+                    long leng = in.length() - 1;
+                    while (leng != -1) {
+                        in.seek(leng--);
+                        out.write(in.read());
+                    }
+                }
+            } else {
+                try (RandomAccessFile rw = new RandomAccessFile(this.fileIn, "rw")) {
+                    long leng = rw.length();
+                    long r = leng - 1;
+                    long w = leng + 1;
+                    int temp;
+
+                    while (r != -1) {
+                        rw.seek(r--);
+                        temp = rw.read();
+                        rw.seek(w++);
+                        rw.write(temp);
+                    }
+                    reWrite(leng, rw);
+                }
             }
         } catch (IOException io) {
             io.printStackTrace();
@@ -109,22 +125,50 @@ public class Converter {
     }
 
     public boolean convertBit() {
-        try (FileInputStream in = new FileInputStream(this.fileIn)) {
-            int first = Integer.toBinaryString(in.read()).charAt(6) - '0';
-            int size = in.available();
-            while (size != 1) {
-                in.skip((long) size - 1);
-                size = in.available();
-            }
-            int last = Integer.toBinaryString(in.read()).charAt(0) - '0';
+        try {
+            if (!this.fileIn.getName().equals(this.fileOut.getName())) {
+                try (RandomAccessFile in = new RandomAccessFile(this.fileIn, "r");
+                     RandomAccessFile out = new RandomAccessFile(this.fileOut, "rw")) {
+                    long leng = in.length() - 1;
+                    int temp;
+                    while (leng != -1) {
+                        in.seek(leng--);
+                        temp = Integer.reverse(in.read()) >> 25;
+                        out.write(temp);
+                    }
+                }
+            } else {
+                try (RandomAccessFile rw = new RandomAccessFile(this.fileIn, "rw")) {
+                    long leng = rw.length();
+                    long r = leng - 1;
+                    long w = leng + 1;
+                    int temp;
 
-            try (FileOutputStream out = new FileOutputStream(this.fileOut)) {
-                out.write(first);
-                out.write(last);
+                    while (r != -1) {
+                        rw.seek(r--);
+                        temp = Integer.reverse(rw.read()) >> 25;
+                        rw.seek(w++);
+                        rw.write(temp);
+                    }
+                    reWrite(leng, rw);
+                }
             }
         } catch (IOException io) {
             io.printStackTrace();
         }
         return true;
+    }
+
+    public void reWrite(long leng, RandomAccessFile rw) throws IOException {
+        long r = leng + 1;
+        long w = 0;
+        int temp;
+        while (w != leng + 1) {
+            rw.seek(r++);
+            temp = rw.read();
+            rw.seek(w++);
+            rw.write(temp);
+        }
+        rw.setLength(w);
     }
 }
