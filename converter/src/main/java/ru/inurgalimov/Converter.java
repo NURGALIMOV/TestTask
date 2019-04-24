@@ -53,8 +53,6 @@ public class Converter {
     }
 
     public static void main(String[] args) {
-        String[] a = {"-s", "C:\\soft\\source.txt", "-t", "bit"};
-        args = a;
         if (args.length == 0) {
             System.out.println("Parameters are not specified!");
             System.out.println("For the program to work, you must specify "
@@ -130,7 +128,7 @@ public class Converter {
                         rw.seek(w++);
                         rw.write(temp);
                     }
-                    rw.setLength(w);
+                    rw.setLength(--w);
                 }
             }
         } catch (IOException io) {
