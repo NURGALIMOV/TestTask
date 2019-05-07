@@ -18,6 +18,7 @@
         <module>search</module>
         <module>hotel</module>
         <module>converter</module>
+        <module>parse</module>
     </modules>
 
     <build>
