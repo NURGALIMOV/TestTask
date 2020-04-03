@@ -56,7 +56,7 @@ public class VacancyDB implements AutoCloseable {
         return state;
     }
 
-    public boolean duplicateСhecking(Vacancy v) throws SQLException {
+    public boolean check(Vacancy v) throws SQLException {
         int count = 0;
         try (PreparedStatement pst = connection.prepareStatement(
                 "SELECT COUNT(id) FROM vacancy AS v WHERE v.name = ?")) {

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Выбор места в зале</title>
+</head>
+<body onload="update()">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+    function payment() {
+        var elements = document.getElementById("table").getElementsByTagName("td");
+        var place;
+        for (var i = 0; i < elements.length; i++) {
+            var item = elements.item(i).childNodes.item(0);
+            if(item.checked) {
+                place = item.value;
+                break;
+            }
+        }
+        if(place != null) {
+            window.location.href = document.location + 'payment.html?id=' + place;
+        } else {
+            alert("Не выбрано место.")
+        }
+
+    }
+    function update() {
+        setInterval($.ajax({
+            type: "GET",
+            url: "http://localhost:8083/cinema/update",
+            data: null,
+            dataType: "json"
+        }).done(function (data) {
+            for (let i = 0; i < data.length; i++) {
+                document.getElementById(data[i]).style.backgroundColor = 'red';
+            }
+        }), 30000);
+    }
+</script>
+<div class="container">
+    <div class="row pt-3">
+        <h4>
+            Бронирование места на сеанс
+        </h4>
+        <table class="table table-bordered" id="table">
+            <thead>
+            <tr>
+                <th style="width: 120px;">Ряд / Место</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>1</th>
+                <td id="11"><input type="radio" name="place" value="11"> Ряд 1, Место 1</td>
+                <td id="12"><input type="radio" name="place" value="12"> Ряд 1, Место 2</td>
+                <td id="13"><input type="radio" name="place" value="13"> Ряд 1, Место 3</td>
+            </tr>
+            <tr>
+                <th>2</th>
+                <td id="21"><input type="radio" name="place" value="21"> Ряд 2, Место 1</td>
+                <td id="22"><input type="radio" name="place" value="22"> Ряд 2, Место 2</td>
+                <td id="23"><input type="radio" name="place" value="23"> Ряд 2, Место 3</td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td id="31"><input type="radio" name="place" value="31"> Ряд 3, Место 1</td>
+                <td id="32"><input type="radio" name="place" value="32"> Ряд 3, Место 2</td>
+                <td id="33"><input type="radio" name="place" value="33"> Ряд 3, Место 3</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row float-right">
+        <button type="button" class="btn btn-success" onclick="payment()">Оплатить</button>
+    </div>
+</div>
+</body>
+</html>

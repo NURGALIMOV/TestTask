@@ -53,7 +53,7 @@ public class SqlRuParser implements Job {
         String exp = CONFIG.get("cron.time");
         try {
             JobDetail job = JobBuilder.newJob(SqlRuParser.class).withIdentity("SqlParse").build();
-            Trigger trigger = trigger = newTrigger()
+            Trigger trigger = newTrigger()
                     .withIdentity("trigger1", "group1")
                     .withSchedule(cronSchedule(exp))
                     .forJob(job)
