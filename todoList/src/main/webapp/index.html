@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>
+
+        function addTask() {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8085/todo/update",
+                data: 'description=' + document.getElementById("description").value,
+                dataType: "json"
+            }).done(function (data) {
+                fill(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log("ERROR", textStatus, errorThrown);
+            });
+        }
+
+        function updateTask(id, description, checked) {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8085/todo/update",
+                data: {id:id, description:description, checked:checked},
+                dataType: "json"
+            }).done(function (data) {
+                fill(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log("ERROR", textStatus, errorThrown);
+            });
+        }
+
+        function updateTable() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8085/todo/update",
+                data: null,
+                dataType: "json"
+            }).done(function (data) {
+                fill(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log("ERROR", textStatus, errorThrown);
+            });
+        }
+
+        function fill(data) {
+            let table = document.getElementById("table");
+            table.getElementsByTagName("TBODY")[0].remove();
+            let tbody = document.createElement("TBODY");
+            table.appendChild(tbody);
+            $.each(data, function(i, item) {
+                let row = document.createElement("TR");
+                let id = document.createElement("TD");
+                id.appendChild(document.createTextNode(data[i].id));
+                let description = document.createElement("TD");
+                description.appendChild (document.createTextNode(data[i].description));
+                let created = document.createElement("TD");
+                created.appendChild (document.createTextNode(data[i].created));
+                let done = document.createElement("TD");
+                let check = document.createElement("input");
+                check.type = "checkbox";
+                check.checked = data[i].done;
+                check.id = data[i].id;
+                check.onchange = function() {
+                    updateTask(data[i].id, data[i].description, check.checked);
+                };
+                let label = document.createElement("label");
+                label.innerText = "Выполнен";
+                done.appendChild(check);
+                done.appendChild(label);
+                row.appendChild(id);
+                row.appendChild(description);
+                row.appendChild(created);
+                row.appendChild(done);
+                if(document.getElementById("all").checked || check.checked) {
+                    tbody.appendChild(row);
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="updateTable()">
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label for="description">Описание:</label>
+            <input type="text" class="form-control" placeholder="Введите описание новой задачи..." id="description">
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="addTask()">Добавить новую задачу</button>
+    </form>
+    <br>
+    <h2>Список задач</h2>
+    <div class="form-check">
+        <label class="form-check-label" for="all">
+            <input type="checkbox" class="form-check-input" id="all" name="allTasks" value="something"
+                   checked onclick="updateTable()">
+            Показать все задачи
+        </label>
+    </div>
+    <table class="table table-bordered" id="table">
+        <thead>
+        <tr>
+            <th>Идентификатор</th>
+            <th>Описание</th>
+            <th>Дата создания</th>
+            <th>Статус</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
